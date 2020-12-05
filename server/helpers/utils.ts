@@ -9,8 +9,10 @@ export function jsonParse(input, fallback?) {
 }
 
 export async function verify(address, msg, sig) {
+  console.log('>>>>>> verify');
+  console.log(address, msg, sig);
   const recovered = await verifyMessage(msg, sig);
-  console.log('>>>>>> verify', recovered, address);
+  console.log(recovered, address);
   return recovered === address;
 }
 

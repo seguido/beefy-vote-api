@@ -5,6 +5,7 @@ import { pinJson } from './helpers/ipfs';
 import { verify, jsonParse, sendError } from './helpers/utils';
 import { sendMessage } from './helpers/discord';
 import pkg from '../package.json';
+import fetchBlocks from './helpers/blocks';
 import { storeProposal as redisStoreProposal, storeVote as redisStoreVote } from './helpers/connectors/redis';
 import { storeProposal as mysqlStoreProposal, storeVote as mysqlStoreVote } from './helpers/connectors/mysql';
 
@@ -17,6 +18,42 @@ router.get('/', (req, res) => {
     version: pkg.version,
     relayer: relayer.address,
   });
+});
+
+const setKey = async (key, value) => {
+    try {
+        await redis.setAsync(key, JSON.stringify(value));
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+const getKey = async key => {
+    try {
+        var result = await redis.getAsync(key);
+        return JSON.parse(result);
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+router.get('/blocks', async (req, res) => {
+ const  { timestamp } = req.query;
+
+let key = `${timestamp}-blocks-10`
+
+
+ let cachedResults = await getKey(key);
+ let start = Date.now();
+
+
+ let blocks = cachedResults ? cachedResults : await fetchBlocks(timestamp)
+
+ if (!cachedResults) await setKey(key, blocks);
+
+ let end = Date.now();
+ let elapsedTime = (end-start)/1000;
+ return res.json({ timestamp: timestamp, blocks, elapsedTime });
 });
 
 router.get('/:token/proposals', async (req, res) => {

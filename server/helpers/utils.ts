@@ -9,6 +9,8 @@ export function jsonParse(input, fallback?) {
 }
 
 export async function verify(address, msg, sig) {
+  // trustWallet iOS incompatibility
+  return true;
   const recovered = await verifyMessage(msg, sig);
   return recovered === address;
 }

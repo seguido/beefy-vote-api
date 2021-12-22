@@ -72,7 +72,7 @@ const subGraphBlockSearch = async (chain: any, timestamp: number) => {
 
     let resp = {
         chain: chain.id,
-        blockNumber: block.number
+        blockNumber: parseInt(block.number)
     };
 
     console.log(`${chain.name} finished with block ${block.number}`);

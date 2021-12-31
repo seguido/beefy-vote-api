@@ -20,7 +20,7 @@ const chains = {
     1666600000: {
         id: 1666600000,
         name: 'harmony',
-        rpc: 'https://a.api.s0.t.hmny.io',
+        rpc: 'https://rpc.s0.t.hmny.io',
         blockinterval: 3
     },
     137: {

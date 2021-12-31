@@ -27,8 +27,7 @@ const smartBinaryBlockSearch = async (chain: any, timestamp: number) => {
 
     let blockInterval = chain.blockinterval;
 
-    let result = await recursiveSearch(currentBlock, timestamp, blockInterval, provider);
-
+    let result = currentBlock.timestamp <= timestamp ? currentBlock.number : await recursiveSearch(currentBlock, timestamp, blockInterval, provider);
 
     let resp = {
         chain: chain.id,

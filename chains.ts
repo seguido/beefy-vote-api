@@ -65,6 +65,17 @@ const chains = {
         rpc: 'https://rpc.fuse.io',
         subgraph: 'https://api.thegraph.com/subgraphs/name/sushiswap/fuse-blocks',
         blockinterval: 5
+    },
+    1284: {
+        id: 1284,
+        name: 'moonbeam',
+        rpc: 'https://rpc.api.moonbeam.network',
+        blockinterval: 12
+    },
+    1313161554: {
+        id: 1313161554,
+        name: 'aurora',
+        rpc: 'https://mainnet.aurora.dev'
     }
 }
 

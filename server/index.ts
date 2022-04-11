@@ -21,39 +21,39 @@ router.get('/', (req, res) => {
 });
 
 const setKey = async (key, value) => {
-    try {
-        await redis.setAsync(key, JSON.stringify(value));
-    } catch (err) {
-        console.log(err);
-    }
+  try {
+    await redis.setAsync(key, JSON.stringify(value));
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 const getKey = async key => {
-    try {
-        var result = await redis.getAsync(key);
-        return JSON.parse(result);
-    } catch (err) {
-        console.log(err);
-    }
+  try {
+    var result = await redis.getAsync(key);
+    return JSON.parse(result);
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 router.get('/blocks', async (req, res) => {
- const  { timestamp } = req.query;
+  const { timestamp } = req.query;
 
-let key = `${timestamp}-blocks-10`
-
-
- let cachedResults = await getKey(key);
- let start = Date.now();
+  let key = `${timestamp}-blocks-14`;
 
 
- let blocks = cachedResults ? cachedResults : await fetchBlocks(timestamp)
+  let cachedResults = await getKey(key);
+  let start = Date.now();
 
- if (!cachedResults) await setKey(key, blocks);
 
- let end = Date.now();
- let elapsedTime = (end-start)/1000;
- return res.json({ timestamp: timestamp, blocks, elapsedTime });
+  let blocks = cachedResults ? cachedResults : await fetchBlocks(timestamp)
+
+  if (!cachedResults) await setKey(key, blocks);
+
+  let end = Date.now();
+  let elapsedTime = (end - start) / 1000;
+  return res.json({ timestamp: timestamp, blocks, elapsedTime });
 });
 
 router.get('/:token/proposals', async (req, res) => {
@@ -102,7 +102,7 @@ router.post('/:token/snapshot/:date', async (req, res) => {
   const sig = await relayer.signMessage(`${token}/snapshot/${date}`);
   const ipfsHash = await pinJson(`${ns}/${sig}`, req.body);
   await redis.hmsetAsync(`token:${token}:snapshot:${date}`, `${date}`, ipfsHash);
-  
+
   let message = `**New Snapshot**\n`;
   message += `Token: ${token}\n`;
   message += `Date: ${date}\n`;

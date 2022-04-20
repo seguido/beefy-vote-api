@@ -4,10 +4,11 @@ import { Block, JsonRpcProvider, Provider } from "@ethersproject/providers";
 
 const fetchBlocks = async (timestamp: number) => {
     console.log(`Starting block fetching`);
+    let startTimestamp = Date.now();
     let promises = [];
     
     Object.values(chains).forEach(chain => {
-        promises.push(findBlockForChain(chain, timestamp));
+        promises.push(findBlockForChain(chain, timestamp, startTimestamp));
     });
 
     let results = await Promise.all(promises);
@@ -16,8 +17,10 @@ const fetchBlocks = async (timestamp: number) => {
     return blockResponse;
 }
 
-const findBlockForChain = async (chain: any, timestamp: number) => {
-    return chain.subgraph ? subGraphBlockSearch(chain, timestamp) : smartBinaryBlockSearch(chain, timestamp);
+const findBlockForChain = async (chain: any, timestamp: number, start: number) => {
+    let block = chain.subgraph ? await subGraphBlockSearch(chain, timestamp) : await smartBinaryBlockSearch(chain, timestamp);
+    console.log(`${chain.name} finished with block ${block.blockNumber} [${((Date.now()-start)/1000).toFixed(2)}s]`);
+    return block;
 }
 
 const smartBinaryBlockSearch = async (chain: any, timestamp: number) => {
@@ -34,14 +37,13 @@ const smartBinaryBlockSearch = async (chain: any, timestamp: number) => {
         blockNumber: result
     };
 
-    console.log(`${chain.name} finished with block ${result}`);
-
     return resp;
 }
 
-const recursiveSearch = async (currentBlock: Block, timestamp:number, interval: number, provider: Provider) => {
-
+const recursiveSearch = async (currentBlock: Block, timestamp:number, interval: number, provider: JsonRpcProvider) => {
+    
     let diff = currentBlock.timestamp - timestamp;
+    // if (provider.network.chainId == 1088) console.log('diff ' + diff + ' ' + currentBlock.number );
 
     if (Math.abs(diff) <= interval) {
         const result = diff > 0 ? currentBlock.number - 1 : currentBlock.number;
@@ -57,8 +59,9 @@ const recursiveSearch = async (currentBlock: Block, timestamp:number, interval: 
     let newBlock = await provider.getBlock(newBlockNumber);
 
     let newInterval = Math.abs((newBlock.timestamp-currentBlock.timestamp) / (newBlock.number - currentBlock.number));
+    // if (provider.network.chainId == 1088) console.log(newInterval);
 
-    return await recursiveSearch(newBlock, timestamp, newInterval, provider);
+    return await recursiveSearch(newBlock, timestamp, newInterval > 0 ? newInterval : 1, provider);
 }
 
 const subGraphBlockSearch = async (chain: any, timestamp: number) => {
@@ -73,8 +76,6 @@ const subGraphBlockSearch = async (chain: any, timestamp: number) => {
         chain: chain.id,
         blockNumber: parseInt(block.number)
     };
-
-    console.log(`${chain.name} finished with block ${block.number}`);
 
     return resp;
 }

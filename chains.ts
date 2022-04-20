@@ -53,12 +53,12 @@ const chains = {
         name: 'avalanche',
         subgraph: 'https://api.thegraph.com/subgraphs/name/dasconnor/avalanche-blocks',
     },
-    1088: {
-        id: 1088,
-        name: 'metis',
-        rpc: 'https://andromeda.metis.io/?owner=1088',
-        blockinterval: 0.8
-    },
+    // 1088: {
+    //     id: 1088,
+    //     name: 'metis',
+    //     rpc: 'https://andromeda.metis.io/?owner=1088',
+    //     blockinterval: 15
+    // },
     122: {
         id: 122,
         name: 'fuse',
